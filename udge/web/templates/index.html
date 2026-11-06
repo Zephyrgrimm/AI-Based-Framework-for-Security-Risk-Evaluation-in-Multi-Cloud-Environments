@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UDGE - Universal Document Generation Engine</title>
+  <link rel="stylesheet" href="/static/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+        </div>
+        <div>
+          <h1>Universal Document Generation Engine</h1>
+          <p class="subtitle">Agentic Multi-Source Synthesis &bull; LibreOffice Automation &bull; Zero Hallucination</p>
+        </div>
+      </div>
+      <div class="header-badges">
+        <span class="badge badge-lo">LibreOffice 26.2 Active</span>
+        <span class="badge badge-ocr">OCR & Vision Ready</span>
+      </div>
+    </header>
+
+    <!-- Main Workspace Grid -->
+    <main class="workspace-grid">
+      <!-- Left Column: Input Form -->
+      <section class="card input-card">
+        <h2 class="card-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+          Configure & Ingest
+        </h2>
+
+        <form id="generationForm">
+          <!-- Template Upload -->
+          <div class="form-group">
+            <label class="field-label">Document Template <span class="required">*</span></label>
+            <p class="field-help">Template file (.md, .txt, .docx, .pdf) with heading structure and placeholder tokens.</p>
+            <div class="file-dropzone" id="templateDropzone">
+              <input type="file" id="templateFile" accept=".md,.markdown,.txt,.docx,.pdf" required>
+              <div class="dropzone-content">
+                <span class="upload-icon">📄</span>
+                <span class="dropzone-text" id="templateName">Choose or drop template (.md, .docx, .pdf, .txt)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Source Files Upload -->
+          <div class="form-group">
+            <label class="field-label">Reference Documents & Materials <span class="required">*</span></label>
+            <p class="field-help">PDFs (text & scanned), Images (PNG, JPG), Word (DOCX), PPTX, XLSX, CSV.</p>
+            <div class="file-dropzone" id="sourcesDropzone">
+              <input type="file" id="sourceFiles" multiple required>
+              <div class="dropzone-content">
+                <span class="upload-icon">📁</span>
+                <span class="dropzone-text" id="sourcesSummary">Select or drop reference materials (multiple)</span>
+              </div>
+            </div>
+            <ul class="file-list" id="selectedSourcesList"></ul>
+          </div>
+
+          <!-- Output Formats -->
+          <div class="form-group">
+            <label class="field-label">Output Formats</label>
+            <div class="checkbox-row">
+              <label class="checkbox-tag"><input type="checkbox" name="fmt" value="pdf" checked> PDF (LibreOffice)</label>
+              <label class="checkbox-tag"><input type="checkbox" name="fmt" value="docx" checked> Word (DOCX)</label>
+              <label class="checkbox-tag"><input type="checkbox" name="fmt" value="odt"> OpenDocument (ODT)</label>
+              <label class="checkbox-tag"><input type="checkbox" name="fmt" value="html"> HTML</label>
+              <label class="checkbox-tag"><input type="checkbox" name="fmt" value="md"> Markdown</label>
+            </div>
+          </div>
+
+          <!-- LLM Engine Selection -->
+          <div class="form-group">
+            <label class="field-label">AI Synthesis Engine</label>
+            <select id="llmProvider" class="select-input">
+              <option value="mock" selected>Mock Offline Engine (Deterministic, Zero Cost, Anti-Hallucination)</option>
+              <option value="gemini">Google Gemini 2.0 Flash (Multimodal Vision + Fast Synthesis)</option>
+              <option value="openai">OpenAI GPT-4o (Vision + Grounded Reasoning)</option>
+              <option value="ollama">Ollama Local LLM (Self-hosted / Private)</option>
+            </select>
+          </div>
+
+          <button type="submit" id="btnSubmit" class="btn-primary">
+            <span>Synthesize Document</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
+        </form>
+      </section>
+
+      <!-- Right Column: Live Orchestrator & Results -->
+      <section class="card progress-card">
+        <h2 class="card-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+          Workflow Orchestration & QA
+        </h2>
+
+        <!-- Pipeline Stages Indicator -->
+        <div class="pipeline-stepper" id="pipelineStepper">
+          <div class="step-item" data-stage="ingesting">
+            <div class="step-circle">1</div>
+            <div class="step-label">Ingestion & OCR</div>
+          </div>
+          <div class="step-item" data-stage="analyzing_template">
+            <div class="step-circle">2</div>
+            <div class="step-label">Template AST</div>
+          </div>
+          <div class="step-item" data-stage="mapping_content">
+            <div class="step-circle">3</div>
+            <div class="step-label">Evidence Mapping</div>
+          </div>
+          <div class="step-item" data-stage="generating_sections">
+            <div class="step-circle">4</div>
+            <div class="step-label">Section Synthesis</div>
+          </div>
+          <div class="step-item" data-stage="editorial_review">
+            <div class="step-circle">5</div>
+            <div class="step-label">Editorial QA</div>
+          </div>
+          <div class="step-item" data-stage="rendering">
+            <div class="step-circle">6</div>
+            <div class="step-label">LibreOffice Export</div>
+          </div>
+          <div class="step-item" data-stage="validating">
+            <div class="step-circle">7</div>
+            <div class="step-label">QA Audit Report</div>
+          </div>
+        </div>
+
+        <!-- Status Box -->
+        <div class="status-box" id="statusBox">
+          <div class="status-idle">
+            <div class="idle-icon">⚡</div>
+            <h3>Ready for Ingestion</h3>
+            <p>Select your template and source materials to initiate the document generation engine.</p>
+          </div>
+        </div>
+
+        <!-- Output Deliverables & QA Results (shown when complete) -->
+        <div class="deliverables-panel" id="deliverablesPanel" style="display: none;">
+          <h3 class="panel-subtitle">Deliverables & Downloads</h3>
+          <div class="downloads-grid" id="downloadsGrid"></div>
+
+          <h3 class="panel-subtitle" style="margin-top: 1.5rem;">Quality Assurance Summary</h3>
+          <div class="qa-metrics" id="qaMetrics"></div>
+          <div class="qa-details" id="qaDetails"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

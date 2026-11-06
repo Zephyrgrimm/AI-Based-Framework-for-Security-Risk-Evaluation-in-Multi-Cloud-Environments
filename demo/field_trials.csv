@@ -1,0 +1,5 @@
+Trial_ID,Bridge_Section,Peak_Vibration_g,Status
+TR-01,North Tower,0.042,Nominal
+TR-02,Mid Span,0.089,Nominal
+TR-03,South Anchorage,0.031,Nominal
+TR-04,Suspension Cable A,0.115,Alert
